@@ -36,6 +36,7 @@ class Process(threading.Thread):
 
         #defines what state that the process is in
         self.type = type
+        
         self.panel = None
         self.daemon = True
         # You will need a process state variable - self.state
