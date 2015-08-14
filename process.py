@@ -24,10 +24,17 @@ class Process(threading.Thread):
         dispatcher - so that the process can notify the dispatcher when it has finished
         """
         threading.Thread.__init__(self)
+        #assign pid..incremented
         self.id = Process.next_id
         Process.next_id += 1
+
+        # this prints the stars to the screen
         self.iosys = iosys
+
+        #assigns a dispatcher...that ensures loading/unloading of processes depending on state
         self.dispatcher = dispatcher
+
+        #defines what state that the process is in
         self.type = type
         self.panel = None
         self.daemon = True
