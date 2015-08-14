@@ -29,6 +29,7 @@ def menu(menu_string):
             letter = command[1]
             function = letter + command[3:]
             command_dictionary[letter] = function
+
         menu_window.addstr(0, 0, menu_string+":", curses.A_REVERSE)
         refresh_menu()
 
@@ -115,7 +116,11 @@ def interactive():
 
 def background():
     """Create a background process."""
+
+    # creating a new process, assigning a io, same dispatcher, given type background
     new_process = process.Process(io_system, the_dispatcher, process.Type.background)
+
+    # adds the process to the stack of runnable processes
     the_dispatcher.add_process(new_process)
     return True
 
@@ -136,8 +141,14 @@ def main(stdscr):
     menu_panel = curses.panel.new_panel(menu_window)
     menu_window.addstr(1, 0, "Stack of runnable processes")
     menu_window.addstr(1, iosys.WINDOW_WIDTH + 3, "Set of waiting processes")
+
+    # assigns a dispatcher object 
     the_dispatcher = dispatcher.Dispatcher()
+
+    # assigns the dispatcher to the iosys object. Also assigns the panels to allow manipulation
     io_system = iosys.IO_Sys(the_dispatcher, panels) # setup the windows
+
+    # give the dispatcher an iosys
     the_dispatcher.set_io_sys(io_system)
     menu("(n)ew, (f)ocus, (t)op, (k)ill, (h)alt, (p)ause, (w)ait, (q)uit")
 

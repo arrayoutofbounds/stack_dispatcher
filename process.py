@@ -36,7 +36,9 @@ class Process(threading.Thread):
 
         #defines what state that the process is in
         self.type = type
-        
+
+        self.state = State.runnable
+
         self.panel = None
         self.daemon = True
         # You will need a process state variable - self.state
@@ -46,10 +48,17 @@ class Process(threading.Thread):
         # ...
 
     def run(self):
+
+        # need to add checks for state
+        # set runnable to 0 , waiting to 1 etc
+
+
         """Start the process running."""
         if self.type == Type.background:
+            # runs the background method from this class itself.
             self.run_background()
         elif self.type == Type.interactive:
+            # runs the interactive thread method from this class itself.
             self.run_interactive()
         self.dispatcher.proc_finished(self)
 
@@ -58,20 +67,29 @@ class Process(threading.Thread):
         # Something like the following but you will have to think about
         # pausing and resuming the process.
 
-        # loops = self.ask_user()
-        # while loops > 0:
-        #     for i in range(loops):
-        #         self.main_process_body()
-        #     self.iosys.write(self, "\n")
-        #     loops = self.ask_user()
+        loops = self.ask_user()
+        while loops > 0:
+            for i in range(loops):
+                self.main_process_body()
+            self.iosys.write(self, "\n")
+            loops = self.ask_user()
 
     def run_background(self):
+        # gets random number from 10 to 160 and then runs the loop that many times.
+        # each time the loop runs it prints a asterix (*).
+
         """Run as a background process."""
         loops = randint(10, 160)
         for i in range(loops):
             self.main_process_body()
 
     def ask_user(self):
+
+        # this method is used inthe run_interactive method above. It 
+        # asks the user for a number to run the loop
+        # if the input is -1 then the process is quit. If above -1 then it runs and 
+        # asks the user again for an input
+
         """Ask the user for number of loops."""
         self.iosys.write(self, "How many loops? ")
         input = self.iosys.read(self)
@@ -84,7 +102,7 @@ class Process(threading.Thread):
         # pausing and resuming the process.
 
         # check to see if supposed to terminate
-        # if self.state == State.killed:
-        #     _thread.exit()
-        # self.iosys.write(self, "*")
+        if self.state == State.killed:
+            _thread.exit()
+        self.iosys.write(self, "*")
         sleep(0.1)

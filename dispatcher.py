@@ -1,6 +1,6 @@
 # A1 for COMPSCI340/SOFTENG370 2015
 # Prepared by Robert Sheehan
-# Modified by ...
+# Modified by Anmol Desai 
 
 # You are not allowed to use any sleep calls.
 
@@ -12,9 +12,17 @@ class Dispatcher():
 
     MAX_PROCESSES = 8
 
+   
     def __init__(self):
         """Construct the dispatcher."""
-        # ...
+        # create a list to simulate a stack
+
+         # list of runnable processes
+        self.runnable_processes = []
+
+        # list of waiting for input procceses
+        self.waiting_proccesses = []
+
 
     def set_io_sys(self, io_sys):
         """Set the io subsystem."""
@@ -23,6 +31,13 @@ class Dispatcher():
     def add_process(self, process):
         """Add and start the process."""
         # ...
+        # put it on top of stack
+        self.runnable_processes.append(process.id)
+
+        #assign it to a window
+        self.io_sys.allocate_window_to_process(process,0)
+
+        process.run()
 
     def dispatch_next_process(self):
         """Dispatch the process at the top of the stack."""
