@@ -11,7 +11,7 @@ class Dispatcher():
     """The dispatcher."""
 
     MAX_PROCESSES = 8
-
+    top_of_stack = 0;
    
     def __init__(self):
         """Construct the dispatcher."""
@@ -34,10 +34,16 @@ class Dispatcher():
         # put it on top of stack
         self.runnable_processes.append(process.id)
 
-        #assign it to a window
-        self.io_sys.allocate_window_to_process(process,0)
+        process.state = State.runnable
 
-        process.run()
+        #assign it to a window
+        self.io_sys.allocate_window_to_process(process,self.top_of_stack)
+
+        # increment the top of stack
+        self.top_of_stack += 1
+
+        # run the process
+        process.start()
 
     def dispatch_next_process(self):
         """Dispatch the process at the top of the stack."""

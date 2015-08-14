@@ -37,15 +37,18 @@ class Process(threading.Thread):
         #defines what state that the process is in
         self.type = type
 
-        self.state = State.runnable
+
 
         self.panel = None
         self.daemon = True
+
         # You will need a process state variable - self.state
         # which should only be modified by the dispatcher and io system.
         # the state can be used to determine which list - runnable or waiting the process
         # appears in.
         # ...
+
+        self.state = None
 
     def run(self):
 
