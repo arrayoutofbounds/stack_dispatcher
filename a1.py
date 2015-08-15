@@ -86,6 +86,9 @@ def kill():
     """Kill the process at the top of the stack."""
     process = get_process_from_user("Enter the number of the process to kill:")
     # ...
+
+    the_dispatcher.killing_process(process)
+
     return False
 
 def halt():
@@ -136,6 +139,8 @@ def quit():
     return True
 
 def main(stdscr):
+
+    # ALL processes have some iosys and dispatcher
     global menu_window, menu_panel, io_system, the_dispatcher
 
     curses.echo()

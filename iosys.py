@@ -96,8 +96,17 @@ class IO_Sys():
 
     def read(self, process):
         """Gets input from the window associated with 'process'."""
+
         # change the state of the process to waiting
-        self.the_dispatcher.proc_waiting(process)
+        
+        # uncomment this after u implement focus and kill
+        #self.the_dispatcher.proc_waiting(process)
+
+        # get the input from the window
+
+
+
+
         # ...
         return # return the data here
 

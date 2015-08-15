@@ -82,6 +82,9 @@ class Process(threading.Thread):
         # Something like the following but you will have to think about
         # pausing and resuming the process.
 
+        # me : after the user input comes back you have to move the window to the next in runnable process
+        # and even set the state of the process to running
+
         loops = self.ask_user()
         while loops > 0:
             for i in range(loops):

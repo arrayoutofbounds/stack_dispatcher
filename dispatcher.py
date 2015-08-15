@@ -16,14 +16,16 @@ class Dispatcher():
     def __init__(self):
         """Construct the dispatcher."""
         # create a list to simulate a stack
+        self.top_of_stack = 0
 
-        self.top_of_stack = 0;
+        # list to show where to place next waiting process
+        self.next_in_waiting = 0
 
          # list of runnable processes
         self.runnable_processes = []
 
         # list of waiting for input procceses
-        self.waiting_proccesses = []
+        self.waiting_processes = []
 
 
     def set_io_sys(self, io_sys):
@@ -163,19 +165,55 @@ class Dispatcher():
         """Receive notification that process is waiting for input."""
         # ...
 
+        # this method tells the dispatcher that the process given input is waiting
+        # so set the state to waiting and remove it from the list of runnable processes
+        # and give it the first empty position in the set of waiting processes
+
+
+        # you do not have to set the process event to clear() as it will not have started running anyway
+        # becuse it starts only when the user input is given in the iosys.read method
+
+        # set the state to waiting
+        process.state = State.waiting
+
+        # get the index of the process to move to waiting
+        indexOfProcess = self.runnable_processes.index(process)
+
+        # delete the process from the runnable list
+        del self.runnable_processes[indexOfProcess]
+
+        # append the process to the list of waiting processes
+        self.waiting_processes.append(process)
+
+        # move the process to the waiting panel
+        self.io_sys.move_process(process,self.next_in_waiting)
+
+        #incrememnt the next space for waiting
+        self.next_in_waiting += 1
+
+
     def process_with_id(self, id):
         """Return the process with the id."""
         # ...
+
+        # need to check if the process is in runnable or waiting list
+        # and carry the code out accordingly
+
         processToMove = None
 
+        # wrong because there will be time when it does not match....and it keeps printing not found that time
         for p in self.runnable_processes:
 
             if(p.id == id):
                 processToMove = p
                 break
-            else:
-                print ("Process Number not found")
         
+        for p in self.waiting_processes:
+
+            if(p.id == id):
+                processToMove = p
+                break
+
         return processToMove
 
     # move the process down the stack   
@@ -200,3 +238,66 @@ class Dispatcher():
         for i in range(0,len(self.runnable_processes)):
 
             self.io_sys.move_process(self.runnable_processes[i],i)
+
+    def moving3(self):
+
+        # this goes throught he updated list and just movies it to the
+        # same position as the index it is in
+        for i in range(0,len(self.waiting)):
+
+            self.io_sys.move_process(self.waiting[i],i)        
+
+
+    def killing_process(self,process):
+
+        #remove from the lists if the process is there
+        if process in self.runnable_processes:
+
+            # need to de allocate that process from the windows
+            self.io_sys.remove_window_from_process(process)
+
+            # get the index of the process to remove
+            index = self.runnable_processes.index(process)
+            
+            # delete that process from the stack
+            del self.runnable_processes[index]
+
+            #decrement top of stack as one item just got deleted permanently from the stack
+            self.top_of_stack -= self.top_of_stack
+
+            # re map the processes left to the window panel
+            self.moving2()
+            
+        elif (process in self.waiting_processes):
+
+            # remove the process from a window
+            self.io_sys.remove_window_from_process(process)
+
+            # need to find the index of the process in the waiting list
+            index1 = self.waiting_processes.index(process)
+
+            # delete the process from the waiting list
+            del self.waiting_processes[index1]
+
+            # decrement as the list for waiting got smaller. So next value is put at a lower value
+            self.next_in_waiting -= 1
+
+            # call this method to rearrange the list.
+            self.moving3()
+        else:
+            pass      
+
+        # set the state of process to kill. This has to be set after the code above as this code will end the thread
+        # refer to process.main body method, where each time the thread is run, it is checked to see if it is to be killed or not
+        # depening on its state
+        process.state = State.killed    
+        
+        # call dispatch method to ensure that the last and the second process in the current representation are run
+        self.dispatch_next_process()
+
+
+
+
+
+
+
