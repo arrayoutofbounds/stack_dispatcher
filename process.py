@@ -94,9 +94,11 @@ class Process(threading.Thread):
         # each time the loop runs it prints a asterix (*).
 
         """Run as a background process."""
-        loops = randint(10, 160)
+        loops = randint(10, 100)
         for i in range(loops):
             self.main_process_body()
+
+        # call this when process is finished     
 
     def ask_user(self):
 

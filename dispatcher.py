@@ -41,11 +41,10 @@ class Dispatcher():
         #assign it to a window
         self.io_sys.allocate_window_to_process(process,self.top_of_stack)
 
-        
-
         # increment the top of stack
         self.top_of_stack += 1
 
+        # set the process flag to true so that it runs
         process.event.set()
         # run the process
         process.start()
@@ -59,7 +58,15 @@ class Dispatcher():
     def dispatch_next_process(self):
         """Dispatch the process at the top of the stack."""
         # ...
+        # set the event to set
 
+        if (len(self.runnable_processes) == 0):
+            pass
+        elif (len(self.runnable_processes) == 1):
+            self.runnable_processes[len(self.runnable_processes) - 1].event.set()
+        else:
+            self.runnable_processes[len(self.runnable_processes) - 2].event.set()
+  
 
 
     def to_top(self, process):
@@ -88,6 +95,34 @@ class Dispatcher():
         """
         # ...
 
+        #step 1 : deallocate the window 
+        self.io_sys.remove_window_from_process(process)
+
+        #remove from list of runnable processes
+        #self.runnable_processes.remove(process)
+        length = len(self.runnable_processes)
+        
+        if(self.runnable_processes[length-1].id == process.id):
+            
+            position = length -1
+            self.moving(position)
+            
+            del self.runnable_processes[length-1]
+        else:
+            position = length -2
+
+            self.moving(position)
+            del self.runnable_processes[length-2]
+
+        #decrement top of stack
+        self.top_of_stack -= self.top_of_stack
+
+        #start the next process
+        self.dispatch_next_process()
+
+
+        #step 2: remove from list of runnable
+
     def proc_waiting(self, process):
         """Receive notification that process is waiting for input."""
         # ...
@@ -96,3 +131,17 @@ class Dispatcher():
         """Return the process with the id."""
         # ...
         return None
+
+    def moving(self,position):
+
+        for i in range(position,len(self.runnable_processes)):
+
+            if(i == len(self.runnable_processes) -1 ):
+                break
+            else:
+                self.io_sys.move_process(self.runnable_processes[i+1],position)
+
+                position += 1
+
+
+
