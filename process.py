@@ -48,12 +48,24 @@ class Process(threading.Thread):
         # appears in.
         # ...
 
-        self.state = None
+        self.state = State.runnable
+
+        # have a threading event added to the process to control this process object from outside
+        self.event = threading.Event()
+
 
     def run(self):
 
         # need to add checks for state
         # set runnable to 0 , waiting to 1 etc
+
+        #if (self.state == State.runnable):
+        #    pass
+        #elif( self.state == Start.waiting):
+        #    pass
+        #else:
+        #    pass       
+
 
 
         """Start the process running."""
@@ -104,8 +116,12 @@ class Process(threading.Thread):
         # Something like the following but you will have to think about
         # pausing and resuming the process.
 
+
         # check to see if supposed to terminate
         if self.state == State.killed:
             _thread.exit()
+        
+        self.event.wait()
+
         self.iosys.write(self, "*")
         sleep(0.1)
