@@ -100,15 +100,14 @@ class IO_Sys():
         # change the state of the process to waiting
         
         # uncomment this after u implement focus and kill
-        #self.the_dispatcher.proc_waiting(process)
+        self.the_dispatcher.proc_waiting(process)
 
         # get the input from the window
 
+        # to get the focus of the window......call the inbuilt focus method 
 
-
-
-        # ...
-        return # return the data here
+        # ... temp value
+        return  2# return the data here
 
 # =======================================================================================================================
 

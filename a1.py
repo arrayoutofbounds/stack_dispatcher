@@ -63,14 +63,20 @@ def focus():
     and then hang around until the user has entered
     data to that process.
     """
-    process = get_process_from_user("Enter the number of the input process:")
+    process = get_process_from_user("Enter the number of the input process:") # get the process that the user entered a number for 
     process.panel.top() # the top panel has the cursor
     curses.panel.update_panels()
     curses.doupdate()
-    input = process.panel.window().getstr()
+    input = process.panel.window().getstr() # get the value that the user entered in the panel as a string
     # only get here after the user has pressed return
     # put the data in the buffer of the process and wake it up
     # ...
+
+    # call the fill buffer and send all the data
+    io_system.fill_buffer(process,input)
+
+    process.event.set()
+
     return False
 
 def top():

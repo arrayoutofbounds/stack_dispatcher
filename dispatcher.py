@@ -124,6 +124,11 @@ class Dispatcher():
         """Hang around until all runnable processes are finished."""
         # ...
 
+        while (len(self.runnable_processes) >0):
+            pass
+
+            
+
     def proc_finished(self, process):
         """Receive notification that "proc" has finished.
         Only called from running processes.
@@ -169,12 +174,11 @@ class Dispatcher():
         # so set the state to waiting and remove it from the list of runnable processes
         # and give it the first empty position in the set of waiting processes
 
-
-        # you do not have to set the process event to clear() as it will not have started running anyway
-        # becuse it starts only when the user input is given in the iosys.read method
-
         # set the state to waiting
         process.state = State.waiting
+
+        # STOP THE PROCESS....
+        process.event.clear()
 
         # get the index of the process to move to waiting
         indexOfProcess = self.runnable_processes.index(process)
@@ -190,6 +194,7 @@ class Dispatcher():
 
         #incrememnt the next space for waiting
         self.next_in_waiting += 1
+        self.top_of_stack -= 1
 
 
     def process_with_id(self, id):
@@ -243,9 +248,9 @@ class Dispatcher():
 
         # this goes throught he updated list and just movies it to the
         # same position as the index it is in
-        for i in range(0,len(self.waiting)):
+        for i in range(0,len(self.waiting_processes)):
 
-            self.io_sys.move_process(self.waiting[i],i)        
+            self.io_sys.move_process(self.waiting_processes[i],i)        
 
 
     def killing_process(self,process):
@@ -263,7 +268,7 @@ class Dispatcher():
             del self.runnable_processes[index]
 
             #decrement top of stack as one item just got deleted permanently from the stack
-            self.top_of_stack -= self.top_of_stack
+            self.top_of_stack -= 1
 
             # re map the processes left to the window panel
             self.moving2()
@@ -294,6 +299,12 @@ class Dispatcher():
         
         # call dispatch method to ensure that the last and the second process in the current representation are run
         self.dispatch_next_process()
+
+    
+    def done_waiting(self,process):
+
+        process.state = State.runnable
+        process.event.set()    
 
 
 
