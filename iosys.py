@@ -107,11 +107,12 @@ class IO_Sys():
         # uncomment this after u implement focus and kill
         self.the_dispatcher.proc_waiting(process)
 
-        # get the input from the window
+        
 
         data = None
         # to get the focus of the window......call the inbuilt focus method
         if process.id in self.process_buffers:
+
             data = self.process_buffers[process.id] 
 
         # call this method to reset the stack to include the runnable process

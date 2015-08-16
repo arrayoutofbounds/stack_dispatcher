@@ -89,8 +89,12 @@ class Process(threading.Thread):
 
         loops = self.ask_user()
         while loops > 0:
+
+            self.iosys.process_buffers.pop(self.id, None)
+
             for i in range(loops):
                 self.main_process_body()
+
             self.iosys.write(self, "\n") # writes the data to the process window
             loops = self.ask_user() # asks the user again for input.
 
