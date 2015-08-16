@@ -120,7 +120,7 @@ class Process(threading.Thread):
         while input is None:
             self.event.wait()
             input = self.iosys.read(self)
-            
+
         if self.state == State.killed:
             _thread.exit()
         return int(input)
