@@ -81,6 +81,11 @@ class Dispatcher():
         """Move the process to the top of the stack."""
         # ...
 
+        # if length of runnable is 2 or more then stop the second last process
+        if(len(self.runnable_processes) >= 2):
+            # make the third to last process wait ( it was the second to last process before we moved a process to the top)
+            self.runnable_processes[len(self.runnable_processes) - 2].event.clear()
+
         # get index of process to move to top
         index = self.runnable_processes.index(process)
 
@@ -96,8 +101,7 @@ class Dispatcher():
         # call the local moving method to make sure that the empty spaces are filled ( i.e list matches the visual....with no gaps)
         self.moving2()
 
-        # make the third to last process wait ( it was the second to last process before we moved a process to the top)
-        self.runnable_processes[len(self.runnable_processes) - 3].event.clear()
+        
 
         # call dispatch method to ensure that the last and the second process in the current representation are run
         self.dispatch_next_process()
