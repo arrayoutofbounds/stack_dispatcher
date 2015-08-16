@@ -75,6 +75,7 @@ def focus():
     # call the fill buffer and send all the data
     io_system.fill_buffer(process,input)
 
+    # set
     process.event.set()
 
     return False

@@ -85,12 +85,14 @@ class Process(threading.Thread):
         # me : after the user input comes back you have to move the window to the next in runnable process
         # and even set the state of the process to running
 
+        # LOOPS WILL NOT RUN IF 0 or LESS
+
         loops = self.ask_user()
         while loops > 0:
             for i in range(loops):
                 self.main_process_body()
-            self.iosys.write(self, "\n")
-            loops = self.ask_user()
+            self.iosys.write(self, "\n") # writes the data to the process window
+            loops = self.ask_user() # asks the user again for input.
 
     def run_background(self):
         # gets random number from 10 to 160 and then runs the loop that many times.
@@ -112,7 +114,13 @@ class Process(threading.Thread):
 
         """Ask the user for number of loops."""
         self.iosys.write(self, "How many loops? ")
-        input = self.iosys.read(self)
+
+        input = None
+
+        while input is None:
+            self.event.wait()
+            input = self.iosys.read(self)
+            
         if self.state == State.killed:
             _thread.exit()
         return int(input)

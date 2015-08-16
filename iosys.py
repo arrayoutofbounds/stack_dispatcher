@@ -93,6 +93,11 @@ class IO_Sys():
     def fill_buffer(self, process, data):
         """Fill the process buffer with data."""
         # ...
+        self.process_buffers[process.id] = data
+
+        #print (data)
+
+
 
     def read(self, process):
         """Gets input from the window associated with 'process'."""
@@ -104,10 +109,16 @@ class IO_Sys():
 
         # get the input from the window
 
-        # to get the focus of the window......call the inbuilt focus method 
+        data = None
+        # to get the focus of the window......call the inbuilt focus method
+        if process.id in self.process_buffers:
+            data = self.process_buffers[process.id] 
+
+        # call this method to reset the stack to include the runnable process
+        #self.the_dispatcher.done_waiting(process)
 
         # ... temp value
-        return  2# return the data here
+        return  data# return the data here
 
 # =======================================================================================================================
 

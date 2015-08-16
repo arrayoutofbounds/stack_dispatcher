@@ -91,7 +91,7 @@ class Dispatcher():
         self.runnable_processes.append(process)
 
         # call the iosys move process method and move the process to the top of the stack -1. I.e just replacing the existing process at top
-        self.io_sys.move_process(process,self.top_of_stack-1)
+        self.io_sys.move_process(process,self.top_of_stack)
 
         # call the local moving method to make sure that the empty spaces are filled ( i.e list matches the visual....with no gaps)
         self.moving2()
@@ -111,14 +111,26 @@ class Dispatcher():
         """
         # set the last 2 items in the list to clear
 
-        self.runnable_processes[len(self.runnable_processes) - 1].event.clear()
-        self.runnable_processes[len(self.runnable_processes) - 2].event.clear()
+        if(len(self.runnable_processes) > 0):
+            self.runnable_processes[len(self.runnable_processes) - 1].event.clear()
+
+        if(len(self.runnable_processes) > 1):
+            self.runnable_processes[len(self.runnable_processes) - 2].event.clear()
+        
 
     def resume_system(self):
         """Resume running the system."""
         # ...
-        self.runnable_processes[len(self.runnable_processes) - 1].event.set()
-        self.runnable_processes[len(self.runnable_processes) - 2].event.set()
+
+        if(len(self.runnable_processes) > 0):
+            self.runnable_processes[len(self.runnable_processes) - 1].event.set()
+
+        if(len(self.runnable_processes) > 1):
+            self.runnable_processes[len(self.runnable_processes) - 2].event.set()
+
+
+        
+        
 
     def wait_until_finished(self):
         """Hang around until all runnable processes are finished."""
@@ -158,7 +170,7 @@ class Dispatcher():
             self.moving2()
 
         #decrement top of stack
-        self.top_of_stack -= self.top_of_stack
+        self.top_of_stack -= 1
 
         #start the next process
         self.dispatch_next_process()
@@ -173,28 +185,70 @@ class Dispatcher():
         # this method tells the dispatcher that the process given input is waiting
         # so set the state to waiting and remove it from the list of runnable processes
         # and give it the first empty position in the set of waiting processes
+        if (process.state == State.runnable):
+            # set the state to waiting
+            process.state = State.waiting
 
-        # set the state to waiting
-        process.state = State.waiting
+            # STOP THE PROCESS....
+            process.event.clear()
 
-        # STOP THE PROCESS....
-        process.event.clear()
+            # get the index of the process to move to waiting
+            indexOfProcess = self.runnable_processes.index(process)
 
-        # get the index of the process to move to waiting
-        indexOfProcess = self.runnable_processes.index(process)
+            # delete the process from the runnable list
+            del self.runnable_processes[indexOfProcess]
+
+            self.top_of_stack -= 1
+
+            # append the process to the list of waiting processes
+            self.waiting_processes.append(process)
+
+            # move the process to the waiting panel
+            self.io_sys.move_process(process,self.next_in_waiting)
+
+            #incrememnt the next space for waiting
+            self.next_in_waiting += 1
+
+            #shuffle things on left to appropriate places
+            self.moving2()
+
+            self.dispatch_next_process()
+            
+        else:
+            self.done_waiting(process)    
+
+
+    def done_waiting(self, process):
+
+        if(self.top_of_stack > 2):
+            for p in range( 0, len(self.runnable_processes) - 2):
+                self.runnable_processes[p].event.clear()
+
+        # set it to runnable
+        process.state = State.runnable
+
+        #set it to run
+        process.event.set()
+
+        # get the index of the process to move from waiting
+        indexOfProcess = self.waiting_processes.index(process)
 
         # delete the process from the runnable list
-        del self.runnable_processes[indexOfProcess]
+        del self.waiting_processes[indexOfProcess]
 
-        # append the process to the list of waiting processes
-        self.waiting_processes.append(process)
+        self.next_in_waiting -= 1
 
-        # move the process to the waiting panel
-        self.io_sys.move_process(process,self.next_in_waiting)
+        # append it to runnable list
+        self.runnable_processes.append(process)
 
-        #incrememnt the next space for waiting
-        self.next_in_waiting += 1
-        self.top_of_stack -= 1
+        # send it to runnable side - visually
+        self.io_sys.move_process(process,self.top_of_stack)
+
+        self.top_of_stack += 1
+
+        self.moving3()
+
+        self.dispatch_next_process()
 
 
     def process_with_id(self, id):
@@ -300,11 +354,9 @@ class Dispatcher():
         # call dispatch method to ensure that the last and the second process in the current representation are run
         self.dispatch_next_process()
 
-    
-    def done_waiting(self,process):
 
-        process.state = State.runnable
-        process.event.set()    
+
+
 
 
 
